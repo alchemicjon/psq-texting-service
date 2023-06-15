@@ -54,5 +54,5 @@ jobs:
         uses: andrewmcodes/bundler-audit-action@v0.1.0
       - name: Brakeman action
         uses: artplan1/brakeman-action@v1.2.1
-      - name: RuboCop Run Action
-        uses: d-lebed/rubocop-run-action@v0.9.0
+      - name: Rubocop checks
+        uses: gimenete/rubocop-action@1.0
