@@ -41,7 +41,7 @@ gem 'phonelib'
 group :development, :test do
   gem 'pry'
   gem 'rubocop'
-  gem 'bundler-audit'
+  gem 'brakeman'
 end
 
 group :development do

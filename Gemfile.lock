@@ -69,10 +69,8 @@ GEM
     ast (2.4.2)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
+    brakeman (6.0.0)
     builder (3.2.4)
-    bundler-audit (0.9.1)
-      bundler (>= 1.2.0, < 3)
-      thor (~> 1.0)
     coderay (1.1.3)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
@@ -185,7 +183,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  bundler-audit
+  brakeman
   pg (~> 1.1)
   phonelib
   pry
