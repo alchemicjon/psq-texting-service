@@ -1,9 +1,14 @@
 require "test_helper"
 
 class MessagesControllerTest < ActionDispatch::IntegrationTest
+  def setup
+    @valid_phone = '8552515727'
+    @invalid_phone = '1234567890'
+  end
+
   test 'create with phone number and message body succeeds' do
     assert_difference("Message.count") do
-      post messages_path, params: { phone_number: '1234567890', message_body: 'Hi there' }, as: :json
+      post messages_path, params: { phone_number: @valid_phone, message_body: 'Hi there' }, as: :json
     end
 
     assert_response :success
@@ -19,7 +24,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test 'create without message_body fails' do
     assert_no_difference("Message.count") do
-      post messages_path, params: { phone_number: '1234567890' }, as: :json
+      post messages_path, params: { phone_number: @valid_phone }, as: :json
     end
 
     assert_response :bad_request
