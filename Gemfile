@@ -40,6 +40,8 @@ gem 'phonelib'
 
 group :development, :test do
   gem 'pry'
+  gem 'rubocop'
+  gem 'bundler-audit'
 end
 
 group :development do
