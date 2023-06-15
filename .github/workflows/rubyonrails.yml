@@ -55,4 +55,4 @@ jobs:
       - name: Brakeman action
         uses: artplan1/brakeman-action@v1.2.1
       - name: Lint Ruby files
-        run: bin/rubocop --parallel
+        run: rubocop --parallel
