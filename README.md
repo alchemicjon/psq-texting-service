@@ -70,3 +70,6 @@ bundle
 ```
 bin/rails s
 ```
+
+## Assumptions
+- This service currently only works for US numbers.
