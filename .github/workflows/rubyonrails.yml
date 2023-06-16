@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
       # Add or replace dependency steps here
       - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
       # Add or replace database setup steps here
@@ -38,7 +38,7 @@ jobs:
         run: bin/rails db:schema:load
       # Add or replace test runners here
       - name: Run tests
-        run: bin/rake
+        run: bin/rails test
 
   lint:
     runs-on: ubuntu-latest
@@ -46,14 +46,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        uses: ruby/setup-ruby@v1
         with:
+          ruby-version: 3.2.2
           bundler-cache: true
-      # Add or replace any other lints here
-      - name: Bundler Audit Action
-        uses: andrewmcodes/bundler-audit-action@v0.1.0
       - name: Brakeman action
-        uses: artplan1/brakeman-action@v1.2.1
+        run: |
+          bundle exec brakeman
       - name: Rubocop checks
         run: |
           bundle exec rubocop
