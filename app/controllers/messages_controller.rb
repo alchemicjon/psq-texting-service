@@ -1,7 +1,7 @@
 class MessagesController < ApplicationController
   def create
     message = Message.create message_params
-    if message.persisted? 
+    if message.persisted?
       render json: message
     else
       render json: { errors: message.errors }, status: :bad_request
