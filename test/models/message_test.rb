@@ -1,18 +1,13 @@
 require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
-  def setup
-    @valid_phone = '8552515727'
-    @invalid_phone = '1234567890'
-  end
-
   test 'create with valid phone number and message body' do
-    message = Message.new(phone_number: @valid_phone, message_body: 'Hello world')
+    message = messages(:valid)
     assert message.save
   end
 
   test 'create with invalid phone number and message body' do
-    message = Message.new(phone_number: @invalid_phone, message_body: 'Hello world')
+    message = messages(:invalid_number)
     assert_not message.save
   end
 
