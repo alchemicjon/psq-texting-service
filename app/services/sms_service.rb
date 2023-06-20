@@ -21,7 +21,7 @@ class SmsService
       callback_url: @callback_url
     })
     @response = HTTParty.post(@provider_uri, @options)
-    @errors.push JSON.parse(@response.parsed_response) unless (@success = @response.success?)
+    @errors.push response_body unless (@success = @response.success?)
     success?
   end
 
@@ -31,6 +31,10 @@ class SmsService
 
   def failure?
     !@success
+  end
+
+  def response_body
+    JSON.parse(@response.parsed_response)
   end
 
   private

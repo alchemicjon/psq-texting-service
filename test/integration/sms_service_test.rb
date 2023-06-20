@@ -18,6 +18,7 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   test 'happy path: success is true' do
     @service.call(@message)
     assert(@service.success?)
+    assert_equal(@service.response_body, { 'message_id' => 'abc123' })
   end
 
   test 'sad path: provider not available' do
