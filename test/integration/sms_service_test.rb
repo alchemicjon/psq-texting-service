@@ -25,6 +25,6 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
       .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
     @service.call(@message)
     assert(@service.failure?)
-    assert_includes(@service.errors, 'Something went wrong')
+    assert_includes(@service.errors, { 'error' => 'Something went wrong' })
   end
 end

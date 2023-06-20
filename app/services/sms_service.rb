@@ -1,5 +1,4 @@
 require 'httparty'
-require 'pry'
 
 class SmsService
   attr_reader :errors, :response
@@ -22,7 +21,7 @@ class SmsService
       callback_url: @callback_url
     })
     @response = HTTParty.post(@provider_uri, @options)
-    @errors.push @response.parsed_response unless (@success = @response.success?)
+    @errors.push JSON.parse(@response.parsed_response) unless (@success = @response.success?)
     success?
   end
 
@@ -37,9 +36,9 @@ class SmsService
   private
 
   def check_valid_message(message)
-    return if message.respond_to?(:phone_number) && message.respond_to?(:message_body)
+    return true if message.respond_to?(:phone_number) && message.respond_to?(:message_body)
 
-    @success = false
     @errors.push 'You need to pass a message to SmsService'
+    @success = false
   end
 end
