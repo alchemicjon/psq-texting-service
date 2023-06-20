@@ -22,6 +22,7 @@ class SmsService
     })
     @response = HTTParty.post(@provider_uri, @options)
     @errors.push response_body unless (@success = @response.success?)
+    update_message(message)
     success?
   end
 
@@ -34,7 +35,11 @@ class SmsService
   end
 
   def response_body
-    JSON.parse(@response.parsed_response)
+    @response.parsed_response
+  end
+
+  def message_id
+    response_body['message_id']
   end
 
   private
@@ -44,5 +49,9 @@ class SmsService
 
     @errors.push 'You need to pass a message to SmsService'
     @success = false
+  end
+
+  def update_message(message)
+    message.update message_id:
   end
 end
