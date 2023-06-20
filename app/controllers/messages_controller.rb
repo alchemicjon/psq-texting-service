@@ -1,10 +1,12 @@
 class MessagesController < ApplicationController
   def create
-    message = Message.create message_params
-    if message.persisted?
-      render json: message
+    @message = Message.create message_params
+    if @message.persisted?
+      @service = SmsService.new
+      @service.call @message
+      service_response
     else
-      render json: { errors: message.errors }, status: :bad_request
+      render json: { errors: @message.errors }, status: :bad_request
     end
   end
 
@@ -12,5 +14,15 @@ class MessagesController < ApplicationController
 
   def message_params
     params.require(:message).permit(:phone_number, :message_body)
+  end
+
+  def service_response
+    if @service.success?
+      data = { id: @message.id }
+      render json: { data: }, status: :created
+    else
+      render json: { message: 'Unable to send message at this time, please try again' },
+             status: :internal_server_error
+    end
   end
 end
