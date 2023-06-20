@@ -79,13 +79,15 @@ GEM
       rexml
     crass (1.0.6)
     date (3.3.3)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
     erubi (1.12.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
     hashdiff (1.0.1)
-    httparty (0.21.0)
-      mini_mime (>= 1.0.0)
-      multi_xml (>= 0.5.2)
+    http-accept (1.7.0)
+    http-cookie (1.0.5)
+      domain_name (~> 0.5)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     json (2.6.3)
@@ -99,10 +101,12 @@ GEM
       net-smtp
     marcel (1.0.2)
     method_source (1.0.0)
+    mime-types (3.4.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2023.0218.1)
     mini_mime (1.1.2)
     minitest (5.18.0)
     msgpack (1.7.1)
-    multi_xml (0.6.0)
     net-imap (0.3.6)
       date
       net-protocol
@@ -112,6 +116,7 @@ GEM
       timeout
     net-smtp (0.3.3)
       net-protocol
+    netrc (0.11.0)
     nio4r (2.5.9)
     nokogiri (1.15.2-arm64-darwin)
       racc (~> 1.4)
@@ -163,6 +168,11 @@ GEM
     rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (2.8.1)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rexml (3.2.5)
     rubocop (1.52.1)
       json (~> 2.3)
@@ -188,6 +198,9 @@ GEM
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
     webmock (3.18.1)
       addressable (>= 2.8.0)
@@ -205,12 +218,12 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   brakeman
-  httparty
   pg (~> 1.1)
   phonelib
   pry
   puma (~> 5.0)
   rails (~> 7.0.5)
+  rest-client
   rubocop
   rubocop-performance
   rubocop-rails

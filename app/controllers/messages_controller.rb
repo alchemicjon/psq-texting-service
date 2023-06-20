@@ -18,7 +18,8 @@ class MessagesController < ApplicationController
 
   def service_response
     if @service.success?
-      render json: { data: @message }, status: :created
+      data = { id: @message.id }
+      render json: { data: }, status: :created
     else
       render json: { message: 'Unable to send message at this time, please try again' },
              status: :internal_server_error

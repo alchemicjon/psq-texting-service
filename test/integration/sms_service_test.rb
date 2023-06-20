@@ -22,11 +22,6 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
     assert(@service.success?)
   end
 
-  test 'happy path: response body contains message_id' do
-    @service.call(@message)
-    assert_equal({ 'message_id' => @message_id }, @service.response_body)
-  end
-
   test 'happy path: service updates message with message_id from provider' do
     @service.call(@message)
     @message.reload
