@@ -22,3 +22,5 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent

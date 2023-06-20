@@ -14,24 +14,15 @@ class SmsService
   end
 
   def call(message)
-    unless message.respond_to?(:phone_number) && message.respond_to?(:message_body)
-      @success = false
-      @errors.push 'You need to pass a message to SmsService'
-      return
-    end
-    body = {
+    return unless check_valid_message(message)
+
+    @options[:body] = JSON.generate({
       to_number: message.phone_number,
       message: message.message_body,
       callback_url: @callback_url
-    }
-    @options[:body] = JSON.generate(body)
-    @response = HTTParty.post(
-      @provider_uri,
-      @options
-    )
-    unless @success = @response.success?
-      @errors.push @response.parsed_response
-    end
+    })
+    @response = HTTParty.post(@provider_uri, @options)
+    @errors.push @response.parsed_response unless (@success = @response.success?)
     success?
   end
 
@@ -41,5 +32,14 @@ class SmsService
 
   def failure?
     !@success
+  end
+
+  private
+
+  def check_valid_message(message)
+    return if message.respond_to?(:phone_number) && message.respond_to?(:message_body)
+
+    @success = false
+    @errors.push 'You need to pass a message to SmsService'
   end
 end
