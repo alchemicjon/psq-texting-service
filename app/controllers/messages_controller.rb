@@ -30,7 +30,7 @@ class MessagesController < ApplicationController
       data = { id: @message.id }
       render json: { data: }, status: :created
     else
-      render json: { message: 'Unable to send message at this time, please try again' },
+      render json: { message: 'Unable to send message at this time, please try again', errors: @service.errors },
              status: :internal_server_error
     end
   end
