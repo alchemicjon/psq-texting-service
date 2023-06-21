@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
   def create
-    @message = Message.create message_params
+    @message = Message.create create_params
     if @message.persisted?
       @service = SmsService.new
       @service.call @message
@@ -10,10 +10,19 @@ class MessagesController < ApplicationController
     end
   end
 
+  def update
+    @message = Message.find_by message_id: update_params[:message_id]
+    @message.update update_params if @message
+  end
+
   private
 
-  def message_params
+  def create_params
     params.require(:message).permit(:phone_number, :message_body)
+  end
+
+  def update_params
+    params.require(:message).permit(:status, :message_id)
   end
 
   def service_response

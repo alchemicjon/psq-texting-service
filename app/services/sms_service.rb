@@ -9,7 +9,7 @@ class SmsService
     @response = nil
     @errors = []
     @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
-    @callback_url = 'https://example.com/delivery_status'
+    @callback_url = 'https://a2c7-2600-4041-2d5-dc00-a022-bc9b-da29-b3d6.ngrok-free.app/messages/delivery_callback'
     @headers = { content_type: :json }
   end
 
