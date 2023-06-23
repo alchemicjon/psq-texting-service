@@ -8,6 +8,7 @@ class SmsService
     @response = nil
     @errors = []
     @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
+    @provider_url_two = 'https://mock-text-provider.parentsquare.com/provider2'
     @callback_url = "https://#{ENV.fetch('PUBLIC_URL', nil)}/messages/delivery_callback"
     @headers = { content_type: :json }
   end
@@ -15,10 +16,18 @@ class SmsService
   def call(message)
     return unless check_valid_message(message)
 
+    url = @provider_url
+    count = 0
     begin
-      @response = RestClient.post(@provider_url, payload(message), @headers)
+      send_sms_request(message, url)
     rescue RestClient::ExceptionWithResponse => e
-      handle_exception e
+      if count < 1
+        url = @provider_url_two
+        count += 1
+        retry
+      else
+        handle_exception e
+      end
     else
       handle_success message
     end
@@ -61,6 +70,10 @@ class SmsService
       message: message.body,
       callback_url: @callback_url
     })
+  end
+
+  def send_sms_request(message, url)
+    @response = RestClient.post(url, payload(message), @headers)
   end
 
   def handle_success(message)
