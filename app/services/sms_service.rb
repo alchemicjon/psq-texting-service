@@ -1,5 +1,4 @@
 require 'rest-client'
-require 'pry'
 
 class SmsService
   attr_reader :errors, :response, :callback_url
@@ -45,16 +44,21 @@ class SmsService
   end
 
   def check_valid_message(message)
-    return true if message.respond_to?(:phone_number) && message.respond_to?(:message_body)
+    if message.respond_to?(:phone_number) == false
+      @errors.push 'No phone number provided'
+    elsif message.phone_number.can_send == false
+      @errors.push 'Cannot send to this number'
+    elsif message.respond_to?(:body) == false
+      @errors.push 'No message body provided'
+    end
 
-    @errors.push 'You need to pass a message to SmsService'
-    @success = false
+    @success = @errors.empty?
   end
 
   def payload(message)
     JSON.generate({
-      to_number: message.phone_number,
-      message: message.message_body,
+      to_number: message.phone_number.number,
+      message: message.body,
       callback_url: @callback_url
     })
   end

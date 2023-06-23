@@ -26,3 +26,4 @@ Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 Metrics/MethodLength:
   CountAsOne: ['array', 'hash', 'method_call']
+  Max: 20

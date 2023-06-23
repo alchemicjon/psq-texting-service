@@ -1,9 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-valid:
-  phone_number: '8552515727'
-  message_body: 'Hello world'
+hello:
+  body: 'Hello world'
+  phone_number: valid
 
-invalid_number:
-  phone_number: '1234567890'
-  message_body: 'Hello World'
+bye:
+  body: 'No good, friend'
+  phone_number: invalid
+
+with_bad_number:
+  body: 'This will not work'
+  phone_number: cannot_send
