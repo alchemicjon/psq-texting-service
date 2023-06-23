@@ -7,3 +7,7 @@ hello:
 bye:
   body: 'No good, friend'
   phone_number: invalid
+
+with_bad_number:
+  body: 'This will not work'
+  phone_number: cannot_send

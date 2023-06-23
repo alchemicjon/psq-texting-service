@@ -12,6 +12,9 @@ class MessagesController < ApplicationController
   def update
     @message = Message.find_by message_id: update_params[:message_id]
     @message&.update update_params
+    return unless update_params[:status].eql? 'invalid'
+
+    @message.phone_number.update can_send: false
   end
 
   private

@@ -13,7 +13,7 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   test 'without valid message it fails' do
     assert_not(@service.call('blah'))
     assert(@service.failure?)
-    assert_includes(@service.errors, 'You need to pass a message to SmsService')
+    assert_includes(@service.errors, 'No phone number provided')
   end
 
   test 'happy path: success is true' do
@@ -33,5 +33,12 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
     @service.call(@message)
     assert(@service.failure?)
     assert_includes(@service.errors, { 'error' => 'Something went wrong' })
+  end
+
+  test 'sad path: phone number has can_send set to false' do
+    message = messages(:with_bad_number)
+    @service.call(message)
+    assert(@service.failure?)
+    assert_includes(@service.errors, 'Cannot send to this number')
   end
 end

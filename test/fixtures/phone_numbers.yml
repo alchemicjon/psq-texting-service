@@ -5,3 +5,7 @@ valid:
 
 invalid:
   number: '1234567890'
+
+cannot_send:
+  number: '9876543210'
+  can_send: false
