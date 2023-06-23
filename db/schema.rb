@@ -10,18 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_21_174455) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_23_151409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "phone_number"
-    t.string "message_body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "message_id"
     t.string "status"
+    t.string "body"
+    t.uuid "phone_number_id", null: false
+    t.index ["phone_number_id"], name: "index_messages_on_phone_number_id"
+  end
+
+  create_table "phone_numbers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "number"
+    t.boolean "can_send"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

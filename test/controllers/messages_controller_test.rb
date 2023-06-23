@@ -9,9 +9,22 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       .to_return(status: 200, body: JSON.generate({ message_id: 'abc123' }))
   end
 
-  test 'create with phone number and message body succeeds' do
-    assert_difference('Message.count') do
-      post messages_path, params: { phone_number: @valid_phone, message_body: 'Hi there' }, as: :json
+  test 'create with new phone number and message body succeeds' do
+    assert_difference('PhoneNumber.count') do
+      assert_difference('Message.count') do
+        post messages_path, params: { number: @valid_phone, body: 'Hi there' }, as: :json
+      end
+    end
+
+    assert_response :success
+  end
+
+  test 'create with existing phone number and message body succeeds' do
+    PhoneNumber.create(number: @valid_phone)
+    assert_no_difference('PhoneNumber.count') do
+      assert_difference('Message.count') do
+        post messages_path, params: { number: @valid_phone, body: 'Hi there' }, as: :json
+      end
     end
 
     assert_response :success
@@ -19,15 +32,15 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   test 'create without phone number fails' do
     assert_no_difference('Message.count') do
-      post messages_path, params: { message_body: 'Hi there' }, as: :json
+      post messages_path, params: { body: 'Hi there' }, as: :json
     end
 
     assert_response :bad_request
   end
 
-  test 'create without message_body fails' do
+  test 'create without body fails' do
     assert_no_difference('Message.count') do
-      post messages_path, params: { phone_number: @valid_phone }, as: :json
+      post messages_path, params: { number: @valid_phone }, as: :json
     end
 
     assert_response :bad_request
@@ -36,8 +49,8 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   test 'service failed' do
     stub_request(:any, @provider_url)
       .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
-    post messages_path, params: { phone_number: @valid_phone, message_body: 'Hi there' }, as: :json
+    post messages_path, params: { number: @valid_phone, body: 'Hi there' }, as: :json
 
-    assert_response :internal_server_error
+    assert_response :bad_request
   end
 end

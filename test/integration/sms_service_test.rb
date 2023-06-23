@@ -3,7 +3,7 @@ require 'test_helper'
 class SmsServiceTest < ActionDispatch::IntegrationTest
   def setup
     @service = SmsService.new
-    @message = messages(:valid)
+    @message = messages(:hello)
     @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
     @message_id = SecureRandom.uuid
     stub_request(:any, @provider_url)
@@ -17,8 +17,7 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   end
 
   test 'happy path: success is true' do
-    m = Message.create(phone_number: @message.phone_number, message_body: @message.message_body)
-    @service.call(m)
+    @service.call(@message)
     assert(@service.success?)
   end
 
