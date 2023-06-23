@@ -2,14 +2,14 @@ require 'rest-client'
 require 'pry'
 
 class SmsService
-  attr_reader :errors, :response
+  attr_reader :errors, :response, :callback_url
 
   def initialize
     @success = nil
     @response = nil
     @errors = []
     @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
-    @callback_url = 'https://example.com/delivery_status'
+    @callback_url = "https://#{ENV.fetch('PUBLIC_URL', nil)}/messages/delivery_callback"
     @headers = { content_type: :json }
   end
 
