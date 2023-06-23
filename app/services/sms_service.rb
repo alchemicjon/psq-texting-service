@@ -9,7 +9,7 @@ class SmsService
     @response = nil
     @errors = []
     @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
-    @callback_url = "https://#{ENV['PUBLIC_URL']}/messages/delivery_callback"
+    @callback_url = "https://#{ENV.fetch('PUBLIC_URL', nil)}/messages/delivery_callback"
     @headers = { content_type: :json }
   end
 

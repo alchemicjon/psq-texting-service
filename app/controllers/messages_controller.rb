@@ -12,7 +12,7 @@ class MessagesController < ApplicationController
 
   def update
     @message = Message.find_by message_id: update_params[:message_id]
-    @message.update update_params if @message
+    @message&.update update_params
   end
 
   private
