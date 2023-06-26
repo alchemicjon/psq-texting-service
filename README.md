@@ -16,7 +16,8 @@ There is some initial setup required to run this API locally. You'll need to:
 - Install Ruby
 - Have the `bundler` gem installed
 - Have a local postgresql install running
-- ngrok installed
+- Have Ngrok installed
+- Clone the repo
 
 If you don't have any of that set up yet and happen to be on a Mac, you may find this [page in the wiki](https://github.com/alchemicjon/psq-texting-service/wiki/Detailed-setup-instructions:-Mac) helpful.
 
