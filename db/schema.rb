@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_23_151409) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_26_153530) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -30,6 +30,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_23_151409) do
     t.boolean "can_send"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "sms_providers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "url"
+    t.integer "attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "weight"
+  end
+
+  create_table "task_records", id: false, force: :cascade do |t|
+    t.string "version", null: false
   end
 
 end

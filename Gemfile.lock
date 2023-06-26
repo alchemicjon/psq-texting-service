@@ -68,6 +68,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.4)
       public_suffix (>= 2.0.2, < 6.0)
+    after_party (1.11.2)
     ast (2.4.2)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
@@ -220,6 +221,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  after_party
   bootsnap
   brakeman
   dotenv-rails

@@ -40,7 +40,11 @@ gem 'bootsnap', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem "rack-cors"
 
+# Use PhoneLib for phone number parsing
 gem 'phonelib'
+
+# Use after party for data changes and setup
+gem 'after_party'
 
 group :development, :test do
   gem 'brakeman'

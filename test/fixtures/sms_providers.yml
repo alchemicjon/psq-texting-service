@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  url: provider_one.com
+  attempts: 0
+  weight: 0.30
+
+two:
+  url: provider_two.com
+  attempts: 0
+  weight: 0.70

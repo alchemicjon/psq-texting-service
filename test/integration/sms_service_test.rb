@@ -4,10 +4,10 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   def setup
     @service = SmsService.new
     @message = messages(:hello)
-    @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
-    @provider_url_two = 'https://mock-text-provider.parentsquare.com/provider2'
+    @provider_one = sms_providers(:one)
+    @provider_two = sms_providers(:two)
     @message_id = SecureRandom.uuid
-    stub_request(:any, @provider_url)
+    stub_request(:any, /.*provider.*/)
       .to_return(status: 200, body: JSON.generate({ message_id: @message_id }))
   end
 
@@ -29,9 +29,7 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   end
 
   test 'sad path: no providers available' do
-    stub_request(:any, @provider_url)
-      .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
-    stub_request(:any, @provider_url_two)
+    stub_request(:any, /.*provider.*/)
       .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
     @service.call(@message)
     assert(@service.failure?)
@@ -46,13 +44,32 @@ class SmsServiceTest < ActionDispatch::IntegrationTest
   end
 
   test 'if one provider fails, try the other one' do
-    stub_request(:any, @provider_url)
+    stub_request(:any, /.*provider.*/)
       .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
-    stub_request(:any, @provider_url_two)
+      .then
       .to_return(status: 200, body: JSON.generate({ message_id: @message_id }))
     @service.call(@message)
-    assert_requested :post, @provider_url, times: 1
-    assert_requested :post, @provider_url_two, times: 1
+    assert_requested :post, @provider_one.url, times: 1
+    assert_requested :post, @provider_two.url, times: 1
     assert(@service.success?)
+  end
+
+  test 'service increments sms provider attempts when called' do
+    # Ensure we pick @provider_one
+    assert_difference('@service.provider.attempts') do
+      @service.call(@message)
+    end
+  end
+
+  test 'providers are load balanced' do
+    run_number = 1000
+    run_number.times do
+      s = SmsService.new
+      s.call(@message)
+    end
+    @provider_one.reload
+    @provider_two.reload
+    assert_in_delta(@provider_one.weight, @provider_one.attempts / run_number.to_f, 0.05)
+    assert_in_delta(@provider_two.weight, @provider_two.attempts / run_number.to_f, 0.05)
   end
 end
