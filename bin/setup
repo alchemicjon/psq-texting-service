@@ -48,13 +48,13 @@ FileUtils.chdir APP_ROOT do
   system! "echo 'PUBLIC_URL: #{trimmed_url}' >> .env"
 
   puts "\n == All set! =="
-  puts "You should now be able to run the API. If your public url changes (i.e. you shut down ngrok when running locally) re-run this script to set the new url in .env."
+  puts 'You should now be able to run the API. If your public url changes (i.e. you shut down ngrok when running locally) re-run this script to set the new url in .env.'
   puts "\n Boot the API using:"
   puts "\n bin/rails server"
   puts "\n Try sending a message using curl!"
-  curl = %{ curl -X POST -H "Content-Type: application/json" \\
+  curl = %( curl -X POST -H "Content-Type: application/json" \\
     -d '{"number": "412 255 2626", "body": "hello world"}' \\
     localhost:3000/messages
-  }
+  )
   puts "\n #{curl}"
 end
