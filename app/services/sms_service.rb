@@ -1,13 +1,14 @@
 require 'rest-client'
 
 class SmsService
-  attr_reader :errors, :response, :callback_url
+  attr_reader :errors, :response, :provider
 
   def initialize
     @success = nil
     @response = nil
     @errors = []
-    @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
+    @provider_attempts = []
+    select_provider
     @callback_url = "https://#{ENV.fetch('PUBLIC_URL', nil)}/messages/delivery_callback"
     @headers = { content_type: :json }
   end
@@ -15,10 +16,17 @@ class SmsService
   def call(message)
     return unless check_valid_message(message)
 
+    count = 0
     begin
-      @response = RestClient.post(@provider_url, payload(message), @headers)
+      send_sms_request(message)
     rescue RestClient::ExceptionWithResponse => e
-      handle_exception e
+      if count < SmsProvider.count - 1
+        select_provider
+        count += 1
+        retry
+      else
+        handle_exception e
+      end
     else
       handle_success message
     end
@@ -34,6 +42,18 @@ class SmsService
   end
 
   private
+
+  def select_provider
+    # Select which provider to use based on weight and whether
+    # that provider has been attempted during #call already
+    providers = SmsProvider.where.not(id: @provider_attempts)
+    total = 0.0
+    ranges = providers.map { |p| [total += p.weight, p.id] }
+    selected = Random.new.rand(providers.sum(:weight))
+    id = ranges.find { |num, _id| num > selected }.last
+    @provider = providers.find_by(id:)
+    @provider_attempts.push @provider.id
+  end
 
   def response_body
     JSON.parse(@response.body)
@@ -55,12 +75,14 @@ class SmsService
     @success = @errors.empty?
   end
 
-  def payload(message)
-    JSON.generate({
+  def send_sms_request(message)
+    payload = JSON.generate({
       to_number: message.phone_number.number,
       message: message.body,
       callback_url: @callback_url
     })
+    @provider.increment(:attempts) && @provider.save
+    @response = RestClient.post(@provider.url, payload, @headers)
   end
 
   def handle_success(message)

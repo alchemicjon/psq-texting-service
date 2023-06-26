@@ -4,8 +4,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   def setup
     @valid_phone = '8552515727'
     @invalid_phone = '1234567890'
-    @provider_url = 'https://mock-text-provider.parentsquare.com/provider1'
-    stub_request(:any, @provider_url)
+    @provider_one = sms_providers(:one)
+    @provider_two = sms_providers(:two)
+    stub_request(:any, /.*provider.*/)
       .to_return(status: 200, body: JSON.generate({ message_id: 'abc123' }))
   end
 
@@ -47,7 +48,7 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'service failed' do
-    stub_request(:any, @provider_url)
+    stub_request(:any, /.*provider.*/)
       .to_return(status: 500, body: JSON.generate({ error: 'Something went wrong' }))
     post messages_path, params: { number: @valid_phone, body: 'Hi there' }, as: :json
 
