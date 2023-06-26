@@ -25,7 +25,6 @@ If you don't have any of that set up yet and happen to be on a Mac, you may find
 You need to create a user with a password for this app to run - remember the password, you'll need it for the setup script.
 ```
 createuser -P -d psq_texting_service
-# Enter a password at the prompt
 ```
 
 ### Start ngrok
@@ -38,7 +37,6 @@ ngrok http 3000
 This script will make sure you have all the gems you need, set up the databases and seed data, and then add your database password and forwarding url to `.env` so that it's available to the app.
 ```
 bin/setup
-# Enter your password and url when prompted
 ```
 
 ## Running the app
@@ -80,32 +78,27 @@ Returns true if the service's `#call` method was successful, and false if it was
 The opposite of `#success?`.
 
 #### Weighting calls to different providers
-The `#select_provider` method of `SmsProvider` has the implementation picking which provider to send the request to. My approach here was to give each provider a `weight` attribute, and use Ruby's `Random` class to pick between the two. Weights are floats that represent a percentage. I got a random float 
-
-I decided to create a `weight` attribute on the `SmsProvider` model to represent the percentage of the time a provider should be picked as floating point number. With the goal of randomly selecting one of the two providers based on their weight value, I created an array of the providers and accumulated the total weight so far. I then generated a random float between 0 and the total sum of all `weight`s, and used the hightest accumulated weight that was less than the random number. Sound confusing? I think so too, so an example may be warrented here.
+The `#select_provider` method of `SmsProvider` picks which provider to send the request to. My approach here was to give each provider a `weight` attribute, and use Ruby's `Random` class to pick between the two. Weights are floats that represent a percentage. With the goal of randomly selecting one of the two providers based on their weight value, I created an array of the providers and accumulated the total weight so far. I then generated a random float between 0 and the total sum of all `weight`s, and used the hightest accumulated weight that was less than the random number. Here's an example to help illustrate what this means.
 
 Let's say we have two providers (a and b) with respective weight values of 0.3 and 0.7. Constructing the array might look a little like this:
 ```
 ranges = [[0.3, a], [1.0, b]]
 ```
-Since provider b has a weight of 0.7, the accumulated weight so far because 1.0. You can add as many providers as you want - if we had 3 providers (a, b, and c) with weights of 0.2, 0.5, and 0.3 respectively, it could look something like...
+Every entry for a provider has an accumulated weight value that is the total of it's weight plus all previous weights. Provider a has a weight of 0.3, and because it's the first provider in the array, the accumulated weight is also 0.3. Since provider b has a weight of 0.7, the accumulated weight becomes 1.0.
+
+You can add as many providers as you want - if we had 3 providers (a, b, and c) with weights of 0.2, 0.5, and 0.3 respectively, it could look something like...
 ```
 ranges = [[0.2, a], [0.7, b], [1.0, c]]
 ```
-Every entry for a provider has a weight value that is the total of it's weight plus all previous weights.
+Once we have that array, we can generate a random float between 0 and the max (in this case 1.0) to determine which provider to pick. We compare the random float with the accumulated weight values in the array. Whichever provider's accumulated weight has the lowest value while still being higher than the random number is chosen.
 
-Once we have that array, we can generate a random float between 0 and the max (in this case 1.0) to determine which one to pick. We take the value in the array with the hightest accumulated weight that is still lower than the random number to do that. For example:
-```
-random = Random.new.rand(1.0)
-# let's say that equals 0.85
-```
-Provider c is the one with the highest accumulated weight (1.0) that's still less than the random number (0.85), so it gets selected. Provider c had a 30% chance of getting selected, and in this implementation that's represented by the fact that it's accumulated weight (1.0) minus the previous weight (0.7) is 0.3.
+Once we have that array, we can generate a random float between 0 and the max (in this case 1.0) to determine which provider to pick. We take the value in the array with the hightest accumulated weight that is still lower than the random number to do that. For example, let's say the random number is 0.85. Provider c has the lowest accumulated weight (1.0) that's still higher than the random number (0.85), so it gets selected. If the random number was 0.6, provider b would be chosen. Provider b had a 50% chance of getting selected, and in this implementation that's represented by the fact that it's accumulated weight (0.7) minus all previous weights (0.2) is 0.5.
 
 #### Retries
-If the provider isn't available, `SmsService` will retry using the remaining providers it knows about. I hang on to the id of all providers attempted in the `@provider_attempts` array. On each try, I select a provider randomly (based on weight, see above) that is not in the list of attempts so far. Since there are only two providers here, it's fairly straightforward - on first attempt, there are no attempted providers yet, so it selects from the entire list and saves the id of the one it tried. On the second attempt, it excludes the first provider it tried, which naturally means the second one is picked. However, you could add any number of providers to the list and the algorithm would still work, and would still use the appropriate weighted distibution to select the next provider. The service will retry until either 1) there's a successful response or 2) there are no providers left to try.
+If the provider isn't available, `SmsService` will retry using the remaining providers it knows about. The service saves the ids of all providers attempted in the `@provider_attempts` array. On each try, it selects a provider randomly (based on weight, see above) that is not in the list of attempts so far. Since there are only two providers in this implementation, it's fairly straightforward - on the first attempt, there are no attempted providers yet, so the service selects from the entire list and saves the id of the one it tried. On the second attempt, it excludes the first provider it tried, which naturally means the second one is picked. However, you could add any number of providers to the list and the algorithm would still work, and would still use the appropriate weighted distibution to select the next provider. The service will retry until either 1) there's a successful response or 2) there are no providers left to try.
 
 ### Phonelib usage
-I used the `phonelib` gem to parse and standardize phone numbers that get sent to the API. A side effect of this is that all phone numbers saved in the database start with "+1" (assuming it's a US number), and as such even if a phone number starts with 3 or 4 when passed to the API, it won't trigger the "invalid" test case from the provider because it actually starts with a "+1".
+I used the `phonelib` gem to parse and standardize phone numbers that get sent to the API. A side effect of this is that all phone numbers saved in the database start with "+1" (assuming it's a US number), and as such even if a phone number starts with 3 or 4 when passed to the API, it won't trigger the "invalid" test case from the provider because it actually starts with a "+1". I decided to use this so that comparing phone numbers is much simpler, and to allow for a range of phone number input formats while using the API.
 
 ## Assumptions
-- This service currently only works for US numbers.
+- This API currently only works for US numbers.
